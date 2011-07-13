@@ -20,7 +20,7 @@ server::server (int port) {
   listen(socket_srvr, 64);
 }
 
-void server::receive() {
+void server::start(char *html) {
   long read_client;
   char buffer[BUFSIZE-1];
   /* Start accepting requests */
@@ -31,18 +31,14 @@ void server::receive() {
   
   read_client = read(socket_con, buffer, BUFSIZE);
   std::cout << buffer << std::endl;
-}
 
-void server::send() {
-  char buffer[BUFSIZE-1];
   sprintf(buffer, "HTTP/1.0 200 OK\r\nContent-Type: %s\r\n\r\n", "text/html");
   write(socket_con, buffer, strlen(buffer));
 
-  sprintf(buffer, "<html><head></head><body><p>Hey now</p></body></html>");
-  write(socket_con, buffer, strlen(buffer));
+  write(socket_con, html, strlen(html));
   close(socket_con);
 }
 
-server::~server() {
-  
+void server::stop() {
+  close(socket_srvr);
 }

@@ -8,9 +8,8 @@ class server {
   size_t length;
 public:
   server(int);
-  void receive(void);
-  void send(void);
-  ~server(void);
+  void start(char *);
+  void stop(void);
 };
 
 #endif
