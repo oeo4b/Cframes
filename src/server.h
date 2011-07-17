@@ -7,8 +7,8 @@ class server {
   int socket_con;
   size_t length;
 public:
-  server(int);
-  void start(char *);
+  void start(int);
+  void loop(int);
   void stop(void);
 };
 
