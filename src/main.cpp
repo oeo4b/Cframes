@@ -1,6 +1,6 @@
 /*
- (c) 2011, Omar
-*/
+ * (c) 2011, Omar
+ */
 
 #include <iostream>
 #include <cstdio>

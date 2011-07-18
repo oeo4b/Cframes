@@ -72,10 +72,15 @@ void server::loop(int hit) {
   /* Interpret the request and create a response here */
   u.parse(request);
 
-  what = r.load(u.controller, u.action);  
+  what = r.load(u.controller, u.action);
+
+  std::cout << "Method: " << u.method << std::endl;
+  std::cout << "Controller: " << u.controller << std::endl;
+  std::cout << "Action: " << u.action << std::endl;
+
   write(socket_con, r.header, strlen(r.header));
   write(socket_con, r.html, strlen(r.html));
-  
+
   /* Close the connection between the server and the client */
   close(socket_con);
 }
