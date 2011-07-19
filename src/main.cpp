@@ -16,7 +16,9 @@ int main(int argc, char **argv) {
   /* Single-threaded forever loop to handle requests -- NOTE: eventually will have a daemon option -d */
   int i;
   for(i=0;i<20;i++) {
-    s.loop(i);
+    std::cout << "Starting app..." << std::endl;
+    s.app(s.wait());
+    std::cout << "App closed." << std::endl;
   }
   s.stop();	
   return 0;

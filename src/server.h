@@ -7,7 +7,8 @@ class server {
   int socket_srvr;
 public:
   void start(int);
-  void loop(int);
+  int wait(void);
+  void app(int);
   void stop(void);
 };
 
