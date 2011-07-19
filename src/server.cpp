@@ -36,7 +36,7 @@
 
 void server::start(int port) {
   /* Create the socket */
-  struct sockaddr_in server_addr;
+  static struct sockaddr_in server_addr;
 
   socket_srvr = socket(AF_INET, SOCK_STREAM, 0);
   server_addr.sin_family = AF_INET;
@@ -54,6 +54,8 @@ void server::loop(int hit) {
    * Write to the socket ->  client gets their response
    *
    */
+  int socket_con;
+  socklen_t length;
   long read_client;
   char header[MAX_BUFFER-1];
   char request[MAX_BUFFER-1];
@@ -62,7 +64,7 @@ void server::loop(int hit) {
   bool what;
 
   /* Start accepting requests */
-  struct sockaddr_in client_addr;
+  static struct sockaddr_in client_addr;
 
   length = sizeof(client_addr);
   socket_con = accept(socket_srvr, (struct sockaddr *)&client_addr, &length);
@@ -72,14 +74,13 @@ void server::loop(int hit) {
   /* Interpret the request and create a response here */
   u.parse(request);
 
-  what = r.load(u.controller, u.action);
-
-  std::cout << "Method: " << u.method << std::endl;
-  std::cout << "Controller: " << u.controller << std::endl;
-  std::cout << "Action: " << u.action << std::endl;
+  what = r.load(u.url, u.controller, u.action);
 
   write(socket_con, r.header, strlen(r.header));
   write(socket_con, r.html, strlen(r.html));
+
+  std::cout << "Hit: " << hit << std::endl;
+  std::cout << "URL: " << u.url << std::endl;
 
   /* Close the connection between the server and the client */
   close(socket_con);

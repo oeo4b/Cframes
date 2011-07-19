@@ -1,5 +1,4 @@
 #include "uri.h"
-#include "config/routes.h"
 #include <iostream>
 #include <cstring>
 #include <cstdio>
@@ -33,22 +32,7 @@ void uri::parse(char *request) {
 
   /* Params? */
   if(request[stop]=='?') {
-    /*
-    start = stop+1;
-    for(i=start;i<strlen(request);i++) {
-      if(request[i]==' ') {
-        stop = i;
-        i = strlen(request);
-      }
-    }
-    
-    parameters = new char[(stop-start)-1];
-    for(i=start,j=0;i<stop;i++,j++) {
-      par[j] = request[i];
-    }
 
-    getParameters();
-    */
   }
 
   /* POST method? */
@@ -130,4 +114,5 @@ uri::~uri(void) {
   delete [] controller;
   delete [] action;
   delete [] method;
+  delete [] url;
 }
