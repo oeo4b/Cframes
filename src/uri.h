@@ -3,15 +3,15 @@
 
 class uri {
  private:
-  void getAction(void);
   void getController(void);
+  void getAction(void);
   void getParameters(void);
  public:
-  char *action;
-  char *controller;
-  char *method;
-  char *parameters;
-  char *url;
+  char method[10];
+  char url[50];
+  char controller[25];
+  char action[25];
+  char parameters[500];
   void parse(char *);
   ~uri(void);
 };

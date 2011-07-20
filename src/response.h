@@ -5,7 +5,7 @@
 class response {
  public:
   char *header;
-  char *html;
+  char *data;
   bool load(char *, char *, char *);
   ~response(void);
 };

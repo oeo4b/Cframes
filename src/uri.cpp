@@ -2,46 +2,60 @@
 #include <iostream>
 #include <cstring>
 #include <cstdio>
-#define MAX_BUF 200
 
 void uri::parse(char *request) {
+  /* Parse the whole request into just the method and URL */
   int i, j;
+ 
+  for(i=0,j=i;request[i]!=' ';i++) {}
+  sprintf(method, "%.*s", i, request+j);  
 
-  method = new char[MAX_BUF];
-  for(i=0,j=0;request[i]!=' ';i++,j++) {
-    method[j] = request[i];
-  }
-  std::cout << i << std::endl;
+  i++;j=i;
+  while((request[i]!=' ')&&(request[i]!='?')) { i++;}
+  sprintf(url, "%.*s", i-j, request+j);
 
-  url = new char[MAX_BUF];
-  /*for(i++,j=0;request[i]!=' ';i++,j++) {
-    url[j] = request[i];
-    }*/
+  /* Parameters? */
+  if((request[i]=='?')&&(request[i+1]!=' ')) { 
+    i++;j=i;
+    while(request[i]!=' ') { i++; }
+    sprintf(parameters, "%.*s", i-j, request+j);
+  } else { sprintf(parameters, NULL); } /* Load none */
 
-  sprintf(url, "url");
-
-  std::cout << i << std::endl;
-
-  action = new char[MAX_BUF];
-  controller = new char[MAX_BUF];
-
-  sprintf(action, "blank");
-  sprintf(controller, "blank");
-}
-
-void uri::getAction(void) {
+  /* Now figure out the controller/action from the URL */
+  getController();
+  getAction();
+  getParameters();
 }
 
 void uri::getController(void) {
+  /* Get controller verb or load default */
+  int i, j;
+  
+  if((strlen(url)>1)&&(url[1]!='/')) {
+    for(i=1,j=i;url[i]!='/';i++) {}
+    sprintf(controller, "%.*s", i-j, url+j);
+  } else { sprintf(controller, "index"); /* load default */ }
+
+}
+
+void uri::getAction(void) {
+  /* Get the action verb or load default */
+  int i, j;
+  bool k = false;
+
+  for(i=1;i<strlen(url);i++) { 
+    if(url[i]=='/') { j=i+1; k=true; break;}
+  }
+  if(k) { sprintf(action, "%.*s", (int)strlen(url)-j, url+j); }
+  else { sprintf(action, "index"); /* load default */ }
+
 }
 
 void uri::getParameters() {
 
+
 }
 
 uri::~uri(void) {
-  delete [] controller;
-  delete [] action;
-  delete [] method;
-  delete [] url;
+
 }
