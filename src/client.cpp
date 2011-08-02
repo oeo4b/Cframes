@@ -6,6 +6,7 @@
 #include "client.h"
 #include <iostream>
 #include <cstring>
+#include <cstdio>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -30,10 +31,19 @@ void client::input(char *request) {
   read_client = recv(socket_con, request, MAX_BUFFER, 0);
 }
 
-void client::output(char *header, char *data) {
+void client::output(char *header, bool bin, char *ascii, FILE *fp) {
+  long size;
+  static char buffer[MAX_BUFFER+1];
   /* Send header and data to client */
   send(socket_con, header, strlen(header), 0);
-  send(socket_con, data, strlen(data), 0);
+  
+  if(!bin) {
+    send(socket_con, ascii, strlen(ascii), 0);
+  } else {
+    fread(buffer, MAX_BUFFER, 1, fp);
+    send(socket_con, buffer, MAX_BUFFER, 0);
+  }
+
 }
 
 client::~client() {
