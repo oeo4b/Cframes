@@ -36,7 +36,7 @@ bool www(void) {
   r.load(u.url, u.controller, u.action);
 
   out("Sending data..............");
-  c.output(r.header, r.data);
+  c.output(r.header, r.bin, r.ascii, r.fp);
   out("OK\n");
 
   return true;
@@ -45,7 +45,7 @@ bool www(void) {
 int main(int argc, char **argv) {
   /* Start the server */
   out("Starting cframes server...");
-  s.start(3000);
+  s.start(5000);
   out("OK\n");
 
   /* Single-threaded forever loop to handle requests -- NOTE: eventually will have a daemon option -d */
