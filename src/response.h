@@ -3,9 +3,16 @@
 #include <cstdio>
 
 class response {
+ private:
+  void binary(void);
+  void render(void);
+  void status(int, char *);
+  void text(void);
  public:
   char *header;
-  char *data;
+  char *ascii;
+  bool bin;
+  FILE *fp;
   bool load(char *, char *, char *);
   ~response(void);
 };

@@ -5,50 +5,51 @@
 
 bool response::load(char *url, char *controller, char *action) {
   long size;
-  FILE *verb;
-  FILE *media;
   char verbp[100];
   char mediap[100];
-
-  header = new char[8096];
-  sprintf(header, "HTTP/1.0 200 OK\r\nContent-Type: %s\r\n\r\n", "text/html");
  
+  /* Content pathways */
   sprintf(verbp, "app/views/layouts/%s.html.c", controller);
   sprintf(mediap, "public/%s", url);
- 
-  verb = fopen(verbp,"r");
-  media = fopen(mediap, "r");
 
-  if(verb!=NULL) {
-    /* Run the controller and load the view */ 
-    fseek(verb, 0, SEEK_END);
-    size = ftell(verb);
-    fseek(verb, 0, SEEK_SET);
-
-    data = new char[size];
-    fread(data, size, 1, verb);
-  }
-  else if(media!=NULL) {
-    /* Different media type? */
-    fseek(media, 0, SEEK_END);
-    size = ftell(media);
-    fseek(media, 0, SEEK_SET);
-
-    data = new char[size];
-    fread(data, size, 1, media);    
-  }
-  else {
-   data = new char[250];
-   sprintf(data, "<html><head></head><body><p>404. That's an error.<br>The requested URL %s was not found on this server.</p></body></html>","/url");
-  }
-
-  if(verb!=NULL) { fclose(verb); }
-  if(media!=NULL) { fclose(media); }
+  /* Priority: controller, public_html, error */
+  if(fp = fopen(verbp,"r")) { status(200, (char *)"text/html"); render(); text(); } 
+  else if(fp = fopen(mediap,"rb")) { status(200, (char *)"image/jpeg"); binary(); } 
+  else { fp = fopen("public/404.html", "r"); status(404, (char *)"text/html"); text(); }
 
   return true;
 }
 
+void response::binary(void) {
+  bin = true;
+  ascii = new char[10];
+}
+
+void response::render(void) {
+  //bin = false;
+}
+
+void response::text(void) {
+  long size;
+  bin = false;
+
+  /* Find the size */
+  fseek(fp, 0, SEEK_END);
+  size = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+
+  /* Read to block */
+  ascii =  new char[size];
+  fread(ascii, size, 1, fp);
+}
+
+void response::status(int code, char *ftype) {
+  header = new char[8096];
+  sprintf(header, "HTTP/1.0 %d OK\r\nContent-Type: %s\r\n\r\n", code, ftype);
+}
+
 response::~response(void) {
+  if(fp!=NULL) { fclose(fp); }
+  delete [] ascii;
   delete [] header;
-  delete [] data;
 }
