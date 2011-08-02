@@ -4,10 +4,11 @@
 
 class response {
  private:
-  void binary(void);
   void render(void);
   void status(int, char *);
   void text(void);
+  bool isbin(char *);
+  void error(int);
  public:
   char *header;
   char *ascii;
