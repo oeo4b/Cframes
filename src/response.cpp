@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstring>
 #include "response.h"
-#include "mvc/controller.h"
+#include "mvc/view.h"
 #include "extensions.h"
 
 bool response::load(char *url, char *controller, char *action) {
@@ -19,7 +19,7 @@ bool response::load(char *url, char *controller, char *action) {
     bin = false; 
     status(200, (char *)"text/html"); 
     text(); 
-    render(); 
+    render(controller, action); 
   } 
   else if(fp = fopen(mediap, "r")) {  
     if(isbin(url)) { 
@@ -68,9 +68,9 @@ void response::error(int code) {
   status(code, (char *)"text/html"); 
 }
 
-void response::render(void) {
+void response::render(char *controller, char *action) {
   /* Render from controller base class */
-  controller c;
+  view v(controller, action);
   char copy[strlen(ascii)];
 
   /* Make a tmp copy of the pre-rendered block and delete */
@@ -78,11 +78,11 @@ void response::render(void) {
   delete [] ascii;
 
   /* Send the copy to the render method */
-  c.render(copy);
+  v.render(copy);
  
   /* Copy the rendered text into the new allocated block */
-  ascii = new char[strlen(c.ascii)];
-  strcpy(ascii, c.ascii);
+  ascii = new char[strlen(v.ascii)];
+  strcpy(ascii, v.ascii);
 }
 
 void response::text(void) {
