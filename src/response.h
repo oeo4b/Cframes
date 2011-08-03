@@ -4,7 +4,7 @@
 
 class response {
  private:
-  void render(void);
+  void render(char *, char *);
   void status(int, char *);
   void text(void);
   bool isbin(char *);
