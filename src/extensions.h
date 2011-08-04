@@ -13,7 +13,8 @@ struct extension {
   {false, (char *)"htm", (char *)"text/html"},
   {false, (char *)"html", (char *)"text/html"},
   {false, (char *)"txt", (char *)"text/html"},
-  {false, (char *)"zip", (char *)"images/zip"},
+  {false, (char *)"zip", (char *)"image/zip"},
+  {true, (char *)"ico", (char *)"image/x-icon"},
   {0, 0, 0}  
 };
 
