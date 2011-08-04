@@ -5,6 +5,8 @@
 
 #include "client.h"
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <cstring>
 #include <cstdio>
 #include <sys/types.h>
@@ -31,17 +33,21 @@ void client::input(char *request) {
   read_client = recv(socket_con, request, MAX_BUFFER, 0);
 }
 
-void client::output(char *header, bool bin, char *ascii, FILE *fp) {
+void client::output(std::string header, bool bin, std::string ascii, char *media) {
   long size;
-  static char buffer[MAX_BUFFER+1];
+  char buffer[MAX_BUFFER+1];
+
   /* Send header and data to client */
-  send(socket_con, header, strlen(header), 0);
+  send(socket_con, header.c_str(), header.length(), 0);
   
   if(!bin) {
-    send(socket_con, ascii, strlen(ascii), 0);
+    send(socket_con, ascii.c_str(), ascii.length(), 0);
   } else {
-    fread(buffer, MAX_BUFFER, 1, fp);
+    ifstream fp;
+    fp.open(media, ios::binary);
+    fp.read(buffer, MAX_BUFFER);
     send(socket_con, buffer, MAX_BUFFER, 0);
+    fp.close();
   }
 
 }

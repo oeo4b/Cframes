@@ -32,11 +32,13 @@ bool www(void) {
   c.input(request);
 
   /* Parse and load the request */
-  u.parse(request);  
+  u.parse(request);
+  out("Controller: ");out(u.controller);out("\n");
+  out("Action: ");out(u.action);out("\n");
   r.load(u.url, u.controller, u.action);
 
   out("Sending data..............");
-  c.output(r.header, r.bin, r.ascii, r.fp);
+  c.output(r.header, r.bin, r.ascii, r.media);
   out("OK\n");
 
   return true;

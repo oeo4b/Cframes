@@ -15,11 +15,13 @@ void uri::parse(char *request) {
   sprintf(url, "%.*s", i-j, request+j);
 
   /* Parameters? */
+  /* This is creating a bus error
   if((request[i]=='?')&&(request[i+1]!=' ')) { 
     i++;j=i;
     while(request[i]!=' ') { i++; }
     sprintf(parameters, "%.*s", i-j, request+j);
-  } else { sprintf(parameters, NULL); } /* Load none */
+  } else { sprintf(parameters, NULL); }
+  */
 
   /* Now figure out the controller/action from the URL */
   getController();

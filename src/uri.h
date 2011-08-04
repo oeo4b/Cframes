@@ -1,5 +1,7 @@
 #ifndef URI_H
 #define URI_H
+#include <string>
+using namespace std;
 
 class uri {
  private:
@@ -11,7 +13,7 @@ class uri {
   char url[50];
   char controller[25];
   char action[25];
-  char parameters[500];
+  string parameters;
   void parse(char *);
   ~uri(void);
 };
