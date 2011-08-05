@@ -1,11 +1,13 @@
 #ifndef VIEW_H
 #define VIEW_H
+#include <string>
+using namespace std;
 
 class view {
  public:
-  char *ascii;
+  string ascii;
   view(char *, char *);
-  void render(char *);
+  string render(string);
   ~view(void);
 };
 

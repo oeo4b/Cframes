@@ -1,5 +1,6 @@
 #include "view.h"
 #include <iostream>
+#include <string>
 #include <cstdio>
 
 view::view(char *controller, char *action) {
@@ -7,13 +8,12 @@ view::view(char *controller, char *action) {
 
 }
 
-void view::render(char *layout) {
+std::string view::render(std::string layout) {
   /* This method replaces all */
 
-  ascii = new char[25];
-  sprintf(ascii, "hello...");
+  return layout;
 }
 
 view::~view(void) {
-  delete [] ascii;
+
 }
