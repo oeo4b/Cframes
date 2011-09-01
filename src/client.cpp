@@ -14,7 +14,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define MAX_BUFFER 10000
+#define MAX_BUFFER 100000
 
 client::client(int socket_srvr) {
   /* 
@@ -34,8 +34,9 @@ void client::input(char *request) {
 }
 
 void client::output(std::string header, bool bin, std::string ascii, char *media) {
+  long i;
   long size;
-  char buffer[MAX_BUFFER+1];
+  char buffer[MAX_BUFFER];
 
   /* Send header and data to client */
   send(socket_con, header.c_str(), header.length(), 0);
@@ -45,8 +46,17 @@ void client::output(std::string header, bool bin, std::string ascii, char *media
   } else {
     ifstream fp;
     fp.open(media, ios::binary);
-    fp.read(buffer, MAX_BUFFER);
-    send(socket_con, buffer, MAX_BUFFER, 0);
+
+    /* Send binary in 100MB blocks */
+    fp.seekg(0, ios::end);
+    size = fp.tellg();
+    fp.seekg(0, ios::beg);
+
+    /* Send binary data in blocks */
+    for(i=0;i<size;i+=MAX_BUFFER) {
+      fp.read(buffer, MAX_BUFFER);
+      send(socket_con, buffer, MAX_BUFFER, 0);
+    }
     fp.close();
   }
 
