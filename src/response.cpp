@@ -1,43 +1,64 @@
 #include <iostream>
+#include <string>
 #include <fstream>
 #include <cstdio>
 #include <cstring>
 #include "response.h"
 #include "mvc/view.h"
-#include "extensions.h"
+#include "lib/extensions.h"
+#include "lib/http.h"
 
 bool response::load(char *url, char *controller, char *action) {
   long size;
-  char verbp[100];
+  char controllerp[100];
+  char actionp[100];
   char mediap[100];
+  bin = false;
  
   /* Content pathways */
-  sprintf(verbp, "app/views/layouts/%s.html.c", controller);
-  sprintf(mediap, "public/%s", url);
+  sprintf(controllerp, "app/views/layouts/%s.html.c", controller);
+  sprintf(actionp, "app/views/%s/%s.html.c", controller, action);
+  sprintf(mediap, "public%s", url);
 
   /* Priority: controller, public_html, error */
-  fp.open(verbp);
-  if(fp.is_open()) { /* Get verb */
-    bin = false; 
-    status((char *)"200", (char *)"text/html"); 
-    text(); 
-    render(controller, action); 
-  } 
-  else { 
-    fp.open(mediap);
-    if(fp.is_open()) { /* Get public_html */
+  controllerfp.open(controllerp);
+  actionfp.open(actionp);
+
+  if(controllerfp.is_open()&&actionfp.is_open()) { /* Get verb */
+    std::cout << "Rendering\t[ " << controller << "/" << action << " ]\n";
+    status(200, (char *)"text/html"); 
+    render(controller, action);
+    
+    /* Close the file streams */
+    controllerfp.close();
+    actionfp.close();
+  }
+  else {
+    /* Close streams if open */
+    if(controllerfp.is_open()) controllerfp.close();
+    if(actionfp.is_open()) actionfp.close();
+
+    /* Try reading from public dir */
+    mediafp.open(mediap);
+    if(mediafp.is_open()) { /* Get public_html */
+      std::cout << "Reading\t\t[ " << url << " ]\n";
       if(isbin(url)) { /* Binary file? */
+        bin = true;
+        status(200, getext(url));
         strcpy(media, mediap);
       }
       else { /* Text file */
+        status(200, getext(url)); 
         text();
       }
     }
     else { /* Error */
-      bin = false;
-      error((char *)"404");
+      std::cout << "Bad URL\t\t[ " << url << " ]\n";
+      status(404, (char *)"text/html"); 
+      mediafp.open("public/404.html");
       text();
     }
+    mediafp.close();
   } 
 
   return true;
@@ -45,70 +66,108 @@ bool response::load(char *url, char *controller, char *action) {
 
 bool response::isbin(char *url) {
   int i, len;
-  bool check = false;
+
+  /* Binary mode? */
+  for(i=0;extensions[i].type!=0;i++) {
+    len = strlen(extensions[i].type);
+    if(!strncmp(url+strlen(url)-len, extensions[i].type, len)) {
+      if(extensions[i].bin) { return true; }
+      else { return false; }
+    }
+  }
+  return true;
+}
+
+char *response::getext(char *url) {
+  int i, len;
+  char *dflt = (char *)"text/html"; /* Set the default ext type */
 
   /* Find the extension and type of URL */
   for(i=0;extensions[i].type!=0;i++) {
     len = strlen(extensions[i].type);
-
     if(!strncmp(url+strlen(url)-len, extensions[i].type, len)) {
-      status((char *)"200", extensions[i].http);
-      bin = extensions[i].bin;
-
-     /* Binary mode? */
-      if(bin) { return true; }
-      else { return false; }
+      return extensions[i].http;
     }
   }
-
-  /* For NULL bin -> binary mode by default */
-  error((char *)"404");
-  bin = true; 
-  return true;
-}
-
-void response::error(char *code) {
-  fp.open("public/404.html"); 
-  status(code, (char *)"text/html"); 
+  return dflt;
 }
 
 void response::render(char *controller, char *action) {
+  /* This method is used to read both files into memory and render using the view object */
+  int i, csize, asize;
+  std::string controllerblock, actionblock;
+
+  /* Find the size */
+  controllerfp.seekg(0, ios::end);
+  csize = controllerfp.tellg();
+  controllerfp.seekg(0, ios::beg);
+  
+  actionfp.seekg(0, ios::end);
+  asize = actionfp.tellg();
+  actionfp.seekg(0, ios::beg);
+
+  /* Read to block */
+  char *cbuffer = new char[csize];
+  char *abuffer = new char[asize];
+  controllerfp.read(cbuffer, csize);
+  actionfp.read(abuffer, asize);
+  for(i=0;i<csize;i++) {
+    controllerblock += cbuffer[i];
+  }
+  for(i=0;i<asize;i++) {
+    actionblock += abuffer[i];
+  }
+
+  delete [] cbuffer;
+  delete [] abuffer;
+
   /* Render from controller base class */
   view v(controller, action);
 
   /* Return the rendered string */
-  ascii = v.render(ascii); 
+  ascii = v.render(controllerblock, actionblock); 
 }
 
 void response::text(void) {
   /* This method is used to read the file into a memory block */
-  int size;
+  int i, size;
 
   /* Find the size */
-  fp.seekg(0, ios::end);
-  size = fp.tellg();
-  fp.seekg(0, ios::beg);
+  mediafp.seekg(0, ios::end);
+  size = mediafp.tellg();
+  mediafp.seekg(0, ios::beg);
 
   /* Read to block */
-  /* Major memory leaks here */
-  char *buffer = new char[size-1];
-  std::cout << "buffer allocated size: " << size << std::endl;
-  std::cout << "ascii string length: " << ascii.length() << std::endl;
-  fp.read(buffer, size);
-  std::cout << "Read buffer: " << strlen(buffer) << std::endl;
-  ascii = buffer;
-  std::cout << "Ascii block: " << ascii.length() << std::endl;
+  char *buffer = new char[size];
+  mediafp.read(buffer, size);
+  for(i=0;i<size;i++) {
+    ascii += buffer[i];
+  }
   delete [] buffer;
 }
 
-void response::status(char *code, char *ftype) {
-  header = "HTTP/1.0 ";
-  header += code;
-  header += " OK\r\nContent-Type: ";
-  header += ftype;
-  header += "\r\n\r\n";
+void response::status(int code, char *ftype) {
+  /* Lookup the header in the http namespace */
+  int i;
+
+  header = http::protocol; header += " ";
+  for(i=0;http::message[i].lookup!=0;i++) {
+    if(http::message[i].lookup==code) {
+      /* Send to client and std out */
+      header += http::message[i].code; header += " ";
+      header += http::message[i].reason; header += " ";
+      std::cout << http::message[i].code << " " << http::message[i].reason << "\t";
+
+      /* Content type */
+      header += "\r\n";
+      header += "Content-Type: ";
+      header += ftype;
+      header += "\r\n\r\n"; 
+    }
+  }
+
 }
 
 response::~response(void) {
-  if(fp.is_open()) { fp.close(); }
+  /*   */
 }

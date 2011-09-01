@@ -7,17 +7,19 @@ using namespace std;
 
 class response {
  private:
+  ifstream controllerfp;
+  ifstream actionfp;
+  ifstream mediafp;
   void render(char *, char *);
-  void status(char *, char *);
+  void status(int, char *);
   void text(void);
   bool isbin(char *);
-  void error(char *);
+  char *getext(char *);
  public:
   string header;
   string ascii;
   char media[100];
   bool bin;
-  ifstream fp;
   bool load(char *, char *, char *);
   ~response(void);
 };
