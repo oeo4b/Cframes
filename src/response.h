@@ -1,5 +1,5 @@
-#ifndef RESPONSE_H
-#define RESPONSE_H
+#ifndef __RESPONSE_H
+#define __RESPONSE_H
 #include <cstdio>
 #include <string>
 #include <fstream>

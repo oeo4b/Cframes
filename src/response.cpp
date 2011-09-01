@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <cstring>
 #include "response.h"
-#include "mvc/view.h"
+#include "script.h"
 #include "lib/extensions.h"
 #include "lib/http.h"
 
@@ -121,10 +121,10 @@ void response::render(char *controller, char *action) {
   delete [] cbuffer;
   delete [] abuffer;
 
-  /* Render from controller base class */
-  view v(controller, action);
+  /* Create a view object */
+  script v;
 
-  /* Return the rendered string */
+  /* Return the rendered string via the nested R scripts */
   ascii = v.render(controllerblock, actionblock); 
 }
 
