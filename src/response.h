@@ -7,8 +7,6 @@ using namespace std;
 
 class response {
  private:
-  ifstream controllerfp;
-  ifstream actionfp;
   ifstream mediafp;
   void render(char *, char *);
   void status(int, char *);

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstdio>
 #include <cstring>
+#include <string>
 #include "response.h"
 #include "script.h"
 #include "lib/extensions.h"
@@ -16,28 +17,22 @@ bool response::load(char *url, char *controller, char *action) {
   bin = false;
  
   /* Content pathways */
-  sprintf(controllerp, "app/views/layouts/%s.html.c", controller);
-  sprintf(actionp, "app/views/%s/%s.html.c", controller, action);
+  sprintf(controllerp, "app/views/layouts/%s.html.R", controller);
+  sprintf(actionp, "app/views/%s/%s.html.R", controller, action);
   sprintf(mediap, "public%s", url);
 
   /* Priority: controller, public_html, error */
-  controllerfp.open(controllerp);
-  actionfp.open(actionp);
+  std::cout << controllerp << "\n" << actionp << "\n" << mediap << "\n";
+  ifstream boolcontroller(controllerp);
+  ifstream boolaction(actionp);
 
-  if(controllerfp.is_open()&&actionfp.is_open()) { /* Get verb */
+  /* Main control flow that determines the appropriate method */
+  if(boolcontroller&&boolaction) { /* Render if true */
     std::cout << "Rendering\t[ " << controller << "/" << action << " ]\n";
     status(200, (char *)"text/html"); 
     render(controller, action);
-    
-    /* Close the file streams */
-    controllerfp.close();
-    actionfp.close();
   }
   else {
-    /* Close streams if open */
-    if(controllerfp.is_open()) controllerfp.close();
-    if(actionfp.is_open()) actionfp.close();
-
     /* Try reading from public dir */
     mediafp.open(mediap);
     if(mediafp.is_open()) { /* Get public_html */
@@ -93,39 +88,13 @@ char *response::getext(char *url) {
 }
 
 void response::render(char *controller, char *action) {
-  /* This method is used to read both files into memory and render using the view object */
-  int i, csize, asize;
-  std::string controllerblock, actionblock;
-
-  /* Find the size */
-  controllerfp.seekg(0, ios::end);
-  csize = controllerfp.tellg();
-  controllerfp.seekg(0, ios::beg);
-  
-  actionfp.seekg(0, ios::end);
-  asize = actionfp.tellg();
-  actionfp.seekg(0, ios::beg);
-
-  /* Read to block */
-  char *cbuffer = new char[csize];
-  char *abuffer = new char[asize];
-  controllerfp.read(cbuffer, csize);
-  actionfp.read(abuffer, asize);
-  for(i=0;i<csize;i++) {
-    controllerblock += cbuffer[i];
-  }
-  for(i=0;i<asize;i++) {
-    actionblock += abuffer[i];
-  }
-
-  delete [] cbuffer;
-  delete [] abuffer;
-
-  /* Create a view object */
-  script v;
+  /* This method creates a script object and renders the controller/action using R */
+  script s;
+  std::string controllerconv = (const char *)controller;
+  std::string actionconv = (const char *)action;  
 
   /* Return the rendered string via the nested R scripts */
-  ascii = v.render(controllerblock, actionblock); 
+  ascii = s.R(controllerconv, actionconv); 
 }
 
 void response::text(void) {
