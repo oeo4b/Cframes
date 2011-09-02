@@ -1,7 +1,7 @@
 (c)2011, cFrames
 
 BRIEF:
-cFrames is a model/view/controller framework designed to provide optimal perfomance while keeping ease of development at a minimum. The cFrames program is implemented using C++ and .e files are interpreted by the program to build a web application. 
+cFrames is a model/view/controller framework designed to provide optimal perfomance while keeping ease of development at a minimum. The cFrames program is implemented using C++ and R scripts are interpreted to build a web application. 
 
 STRUCTURE:
 
