@@ -6,7 +6,7 @@ using namespace std;
 class script {
  public:
   string ascii;
-  string render(string, string);
+  string R(string, string);
 };
 
 #endif
