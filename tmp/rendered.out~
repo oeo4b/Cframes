@@ -1,0 +1,19 @@
+<html>
+<head>
+  <title>The internet</title>
+<script type='text/javascript' src='jquery.js'></script>
+</head>
+<body>
+<p><h1>People</h1>
+<tl>
+  
+  <tr>bob</tr>
+  
+  <tr>joe</tr>
+  
+  <tr>sue</tr>
+  
+</tl>
+</p>
+</body>
+</html>
