@@ -7,6 +7,7 @@ class script {
  public:
   string ascii;
   string R(string, string);
+  string makerandomstr(int);
 };
 
 #endif
