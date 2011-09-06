@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdio>
 #include <ctime>
+#include <cstring>
 #include "server.h"
 #include "client.h"
 #include "uri.h"
