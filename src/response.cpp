@@ -22,7 +22,6 @@ bool response::load(char *url, char *controller, char *action) {
   sprintf(mediap, "public%s", url);
 
   /* Priority: controller, public_html, error */
-  std::cout << controllerp << "\n" << actionp << "\n" << mediap << "\n";
   ifstream boolcontroller(controllerp);
   ifstream boolaction(actionp);
 
