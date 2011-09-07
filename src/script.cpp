@@ -36,6 +36,10 @@ string script::R(string controller, string action) {
   for(i=0;i<length;i++) {
     rendered += buffer[i];
   }
+
+  /* Flush tmp file and return */
+  call = "rm "+filepath;
+  check = system(call.c_str());
   return rendered;
 }
 
