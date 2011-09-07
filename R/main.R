@@ -18,16 +18,10 @@ controllers <- dir("app/controllers/")
 models <- dir("app/models/")
 views <- dir("app/views/")
 
-check <- 0
+controllerbool <<- FALSE
 for(i in controllers) {
   if(i==paste(controller, "_controller.R", sep="")) {
-    check <- check+1
-  }
-}
-
-for(i in models) {
-  if(i==paste(controller, ".R", sep="")) {
-    check <- check+1
+    controllerbool <<- TRUE
   }
 }
 
@@ -41,9 +35,7 @@ camelcase <- function(x) {
 
 ## Main function
 main <- function() {
-  # Include the controller/model
-  source("R/model.R")
-  source(paste("app/models/", controller, ".R", sep=""))
+  # Include the controller
   source("R/controller.R")
   source("app/controllers/app_controller.R")
   source(paste("app/controllers/", controller, "_controller.R", sep=""))
@@ -51,7 +43,9 @@ main <- function() {
   # Valid controller/action args -- start app
   object <- new(camelcase(controller))
   called <- call(action, object)
-  data <- eval(called)
+
+  # 'this' is the object that can be called from the view templates
+  this <- eval(called)
 
   # Send evaluated object to the view
   source("R/view.R") 
@@ -65,10 +59,10 @@ main <- function() {
 }
 
 # If false return error
-if(check==2) {
+if(controllerbool) {
   main()
 }
-if(check!=2) {
+if(!controllerbool) {
   # Invalid path return error
-  cat("Error\n")
+  cat("Error: No controller script present\n")
 }
